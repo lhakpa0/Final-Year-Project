@@ -24,4 +24,12 @@ df = pd.read_csv(raw_path)
 print(df.head())
 print(df.shape)
 print(df.columns)
+print(df.info())
+
+# Removing rows where the target is missing.
+df = df.dropna(subset=["CarbonEmission"])
+
+# Separating features (X) and target (y)
+X = df.drop("CarbonEmission", axis=1)
+y = df["CarbonEmission"]
 
