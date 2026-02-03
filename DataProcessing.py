@@ -19,12 +19,33 @@ columns = [
     "CookingWith", "CarbonEmission"
 ]
 
+TARGET = "CarbonEmission"
 df = pd.read_csv(raw_path)
 
-print(df.head())
-print(df.shape)
-print(df.columns)
-print(df.info())
+df.columns = columns
+# Defining categorical and numerical columns
+CATEGORICAL_COLS = [
+    "BodyType", "Sex", "Diet", "HowOftenShower", "HeatingEnergySource",
+    "Transport", "VehicleType", "SocialActivity", "WasteBagSize",
+    "Recycling", "CookingWith"
+]
+NUMERIC_COLS = [
+    "MonthlyGroceryBill",
+    "VehicleMonthlyDistanceKm",
+    "WasteBagWeeklyCount",
+    "HowLongTVPCDailyHour",
+    "HowManyNewClothesMonthly",
+    "HowLongInternetDailyHour"
+]
+
+# Initial data exploration
+print("\nMissing values per column:")
+print(df.isna().sum().sort_values(ascending=False))
+
+print("\nDuplicate rows:", df.duplicated().sum())
+
+# Optional: remove duplicates
+df = df.drop_duplicates()
 
 # Removing rows where the target is missing.
 df = df.dropna(subset=["CarbonEmission"])
