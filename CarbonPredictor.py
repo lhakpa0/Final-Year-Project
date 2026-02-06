@@ -1,12 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.model_selection import train_test_split#
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.preprocessing import StandardScaler
-from streamlit import pdf
 
 # Load dataset
 raw_path = "Carbon Emission.csv"
@@ -19,9 +14,21 @@ columns = [
     "HowLongInternetDailyHour", "EnergyEfficiency", "Recycling",
     "CookingWith", "CarbonEmission"
 ]
-
+df = pd.read_csv(raw_path)
 TARGET = "CarbonEmission"
 
+if TARGET in df.columns:
+    print("\n=== Target Variable Summary ===")
+    print(df[TARGET].describe())
+
+    # Target distribution
+    plt.figure()
+    df[TARGET].hist(bins=30)
+    plt.title("Distribution of CarbonEmission Target")
+    plt.xlabel("CarbonEmission")
+    plt.ylabel("Frequency")
+    plt.show()
+    
 df = pd.read_csv(raw_path)
 
 print("Shape:", df.shape)
