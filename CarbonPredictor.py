@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split#
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 # Load dataset
 raw_path = "Carbon Emission.csv"
@@ -28,8 +30,6 @@ if TARGET in df.columns:
     plt.xlabel("CarbonEmission")
     plt.ylabel("Frequency")
     plt.show()
-    
-df = pd.read_csv(raw_path)
 
 print("Shape:", df.shape)
 print(df.head())
@@ -93,12 +93,11 @@ ordinal_mappings = {
     }
 }
 
-# Apply ordinal mappings
+# Applying ordinal mappings
 for col, mapping in ordinal_mappings.items():
     if col in X.columns:
         X[col] = X[col].map(mapping)
 
-print("Ordinal encoding applied successfully.")
 
 # Nominal Encoding (One-Hot Encoding)
 # Identifying nominal categorical columns automatically
@@ -110,13 +109,49 @@ print(nominal_cols)
 # Applying One-Hot Encoding
 X_encoded = pd.get_dummies(X, columns=nominal_cols, drop_first=True)
 
-print("\nFinal Encoded Feature Shape:", X_encoded.shape)
-
-
-# Save Encoded Dataset
+# Saving Encoded Dataset
 X_encoded.to_csv("X_encoded.csv", index=False)
 y.to_csv("y_target.csv", index=False)
 
 print("\nSaved encoded features to: X_encoded.csv")
 print("Saved target to: y_target.csv")
 
+# Loading encoded data
+X_encoded = pd.read_csv("X_encoded.csv")
+
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X_encoded, y, test_size=0.2, random_state=42
+)
+
+# Training a model
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Predicting and evaluating
+y_pred = model.predict(X_test)
+print(f"R² Score: {r2_score(y_test, y_pred):.3f}")
+print(f"MAE: {mean_absolute_error(y_test, y_pred):.3f}")
+
+print(f"Carbon Emission Range: {y.min()} to {y.max()}")
+print(f"Mean Carbon Emission: {y.mean()}")
+print(f"MAE as % of mean: {(230.370 / y.mean()) * 100:.2f}%")
+
+# feature importance
+importances = model.feature_importances_
+feature_names = X_encoded.columns
+importance_df = pd.DataFrame({
+    'Feature': feature_names,
+    'Importance': importances
+}).sort_values('Importance', ascending=False)
+
+print(importance_df.head(10))
+
+# Visualizing
+plt.figure(figsize=(10, 6))
+plt.barh(importance_df.head(10)['Feature'], importance_df.head(10)['Importance'])
+plt.xlabel('Importance')
+plt.title('Top 10 Features Affecting Carbon Emissions')
+plt.gca().invert_yaxis()
+plt.show()
