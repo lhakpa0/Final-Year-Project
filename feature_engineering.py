@@ -55,3 +55,27 @@ print(df[["TotalScreenTime","ConsumptionScore","TravelIntensity","WasteScore"]].
 df.to_csv("carbon_engineered.csv", index=False)
 
 print("\nNew dataset saved as: carbon_engineered.csv")
+
+import pandas as pd
+df = pd.read_csv("carbon_engineered.csv")
+print(df.shape)
+print(df[["TotalScreenTime",
+          "ConsumptionScore",
+          "TravelIntensity",
+          "WasteScore"]].head())
+
+new_features = [
+    "TotalScreenTime",
+    "ConsumptionScore",
+    "TravelIntensity",
+    "WasteScore"
+]
+
+print(df[new_features + ["CarbonEmission"]].corr()["CarbonEmission"])
+
+import matplotlib.pyplot as plt
+
+df[new_features + ["CarbonEmission"]].corr()["CarbonEmission"][:-1].plot(kind="bar")
+plt.title("Correlation of Engineered Features with Carbon Emission")
+plt.ylabel("Correlation value")
+plt.show()
