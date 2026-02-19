@@ -11,7 +11,7 @@ df = pd.read_csv("carbon_engineered.csv")
 TARGET = "CarbonEmission"
 
 # Split features/target
-X = df.drop(columns=[TARGET]).copy()  # FIX 1: .copy() prevents SettingWithCopyWarning
+X = df.drop(columns=[TARGET]).copy()  
 y = df[TARGET]
 
 # Ordinal encoding
