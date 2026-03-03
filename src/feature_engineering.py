@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Loading dataset
-df = pd.read_csv("Carbon Emission.csv")
+df = pd.read_csv("data/Carbon Emission.csv")
 
 print("Initial dataset shape:", df.shape)
 

@@ -6,7 +6,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 # Load dataset
-raw_path = "Carbon Emission.csv"
+raw_path = "data/Carbon Emission.csv"
 df = pd.read_csv(raw_path)
 TARGET = "CarbonEmission"
 

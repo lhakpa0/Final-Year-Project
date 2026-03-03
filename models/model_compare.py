@@ -7,17 +7,14 @@ from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_absolute_error, r2_score
 
 # Load engineered dataset
-df = pd.read_csv("carbon_engineered.csv")
+df = pd.read_csv("data/carbon_engineered.csv")
 TARGET = "CarbonEmission"
 
 # Split features/target
 X = df.drop(columns=[TARGET]).copy()  
 y = df[TARGET]
 
-# Train/test split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+
 
 # Ordinal encoding
 ordinal_mappings = {
@@ -59,12 +56,10 @@ X = pd.get_dummies(X, drop_first=True)
 # remove any remaining missing values
 X = X.fillna(0)
 
-
 # Train/test split
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
-
 models = {
     "Linear Regression": Pipeline([
         ("scaler", StandardScaler()),
@@ -81,7 +76,7 @@ models = {
 # Store results in a DataFrame for better visualization
 results = []
 
-print("\n=== MODEL COMPARISON ===\n")
+print("\n MODEL COMPARISON \n")
 for name, model in models.items():
     model.fit(X_train, y_train)
     pred = model.predict(X_test)
@@ -89,8 +84,8 @@ for name, model in models.items():
     r2  = r2_score(y_test, pred)
     mae = mean_absolute_error(y_test, pred)
 
-    # FIX 6: Cross-validation for more reliable estimates
-    cv_r2 = cross_val_score(model, X, y, cv=5, scoring="r2", n_jobs=-1).mean()
+    # Cross-validation for more reliable estimates
+    cv_r2 = cross_val_score(model, X_train, y_train, cv=5, scoring="r2", n_jobs=-1).mean()
 
     results.append({"Model": name, "R²": round(r2, 4), "MAE": round(mae, 2), "CV R² (5-fold)": round(cv_r2, 4)})
 
