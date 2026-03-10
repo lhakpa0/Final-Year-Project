@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # Loading dataset
 df = pd.read_csv("data/Carbon Emission.csv")
@@ -48,22 +49,6 @@ df["WasteScore"] = (
     df["Waste Bag Weekly Count"] * df["WasteSizeScore"]
 )
 
-print("\nNew columns created:")
-print(df[["TotalScreenTime","ConsumptionScore","TravelIntensity","WasteScore"]].head())
-
-# Save new dataset
-df.to_csv("carbon_engineered.csv", index=False)
-
-print("\nNew dataset saved as: carbon_engineered.csv")
-
-import pandas as pd
-df = pd.read_csv("carbon_engineered.csv")
-print(df.shape)
-print(df[["TotalScreenTime",
-          "ConsumptionScore",
-          "TravelIntensity",
-          "WasteScore"]].head())
-
 new_features = [
     "TotalScreenTime",
     "ConsumptionScore",
@@ -71,9 +56,17 @@ new_features = [
     "WasteScore"
 ]
 
-print(df[new_features + ["CarbonEmission"]].corr()["CarbonEmission"])
+print("\nNew columns created:")
+print(df[new_features].head())
+print(df.shape)
 
-import matplotlib.pyplot as plt
+# Save new dataset to the data directory so other scripts can find it
+out_path = "data/carbon_engineered.csv"
+df.to_csv(out_path, index=False)
+print(f"\nNew dataset saved as: {out_path}")
+
+# Correlation of engineered features with target
+print(df[new_features + ["CarbonEmission"]].corr()["CarbonEmission"])
 
 df[new_features + ["CarbonEmission"]].corr()["CarbonEmission"][:-1].plot(kind="bar")
 plt.title("Correlation of Engineered Features with Carbon Emission")
