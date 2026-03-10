@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import joblib
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
@@ -99,3 +101,51 @@ for name, model in models.items():
 results_df = pd.DataFrame(results).sort_values("CV R² (5-fold)", ascending=False)
 print("\n=== SUMMARY TABLE ===")
 print(results_df.to_string(index=False))
+
+best_model = models["Gradient Boosting"]
+best_model.fit(X_train, y_train)
+y_pred = best_model.predict(X_test)
+
+plt.figure()
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual CarbonEmission")
+plt.ylabel("Predicted CarbonEmission")
+plt.title("Predicted vs Actual (Gradient Boosting)")
+# ideal line y = x
+mn = min(y_test.min(), y_pred.min())
+mx = max(y_test.max(), y_pred.max())
+plt.plot([mn, mx], [mn, mx])
+plt.show()
+
+# residuals
+residuals = y_test - y_pred
+
+plt.figure()
+plt.scatter(y_pred, residuals)
+plt.axhline(0)
+plt.xlabel("Predicted CarbonEmission")
+plt.ylabel("Residual (Actual - Predicted)")
+plt.title("Residuals vs Predicted (Gradient Boosting)")
+plt.show()
+
+gb = models["Gradient Boosting"]
+gb.fit(X_train, y_train)
+
+importances = pd.Series(gb.feature_importances_, index=X_train.columns)
+top_features = importances.sort_values(ascending=False).head(15)
+
+plt.figure()
+top_features.sort_values().plot(kind="barh")
+plt.xlabel("Importance Score")
+plt.title("Top 15 Feature Importances (Gradient Boosting)")
+plt.show()
+
+
+
+# Save trained model
+joblib.dump(best_model, "models/gb_model.pkl")
+
+# Save feature column order
+joblib.dump(X.columns.tolist(), "models/model_columns.pkl")
+
+print("Model saved successfully.")
