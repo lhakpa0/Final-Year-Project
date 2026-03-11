@@ -1,3 +1,5 @@
+import os
+import joblib
 import pandas as pd
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LinearRegression
@@ -66,15 +68,16 @@ models = {
         ("model", LinearRegression())
     ]),
     "Random Forest": RandomForestRegressor(
-        n_estimators=300, random_state=42, n_jobs=-1
+        n_estimators=100, random_state=42, n_jobs=-1
     ),
     "Gradient Boosting": GradientBoostingRegressor(
-        n_estimators=300, learning_rate=0.05, max_depth=4, random_state=42
+        n_estimators=100, learning_rate=0.05, max_depth=4, random_state=42
     )
 }
 
 # Store results in a DataFrame for better visualization
 results = []
+trained_models = {}
 
 print("\n MODEL COMPARISON \n")
 for name, model in models.items():
@@ -88,6 +91,7 @@ for name, model in models.items():
     cv_r2 = cross_val_score(model, X_train, y_train, cv=5, scoring="r2", n_jobs=-1).mean()
 
     results.append({"Model": name, "R²": round(r2, 4), "MAE": round(mae, 2), "CV R² (5-fold)": round(cv_r2, 4)})
+    trained_models[name] = model
 
     print(f"{name}")
     print(f"  R²           : {r2:.4f}")
@@ -99,3 +103,20 @@ for name, model in models.items():
 results_df = pd.DataFrame(results).sort_values("CV R² (5-fold)", ascending=False)
 print("\n=== SUMMARY TABLE ===")
 print(results_df.to_string(index=False))
+
+# Automatically select the best model based on CV R²
+best_row = results_df.iloc[0]
+best_name = best_row["Model"]
+best_model = trained_models[best_name]
+
+print(f"\n=== BEST MODEL SELECTED ===")
+print(f"  Name         : {best_name}")
+print(f"  CV R² (5-fold): {best_row['CV R² (5-fold)']:.4f}")
+print(f"  R²           : {best_row['R²']:.4f}")
+print(f"  MAE          : {best_row['MAE']:.2f}")
+
+# Save the best model for later use
+os.makedirs("models", exist_ok=True)
+model_path = "models/best_model.pkl"
+joblib.dump(best_model, model_path)
+print(f"\nBest model saved to: {model_path}")
