@@ -22,9 +22,8 @@ df["ConsumptionScore"] = (
 air_map = {
     "never":0,
     "rarely":1,
-    "sometimes":2,
-    "frequently":3,
-    "very frequently":4
+    "frequently":2,
+    "very frequently":3
 }
 
 df["AirTravelScore"] = df["Frequency of Traveling by Air"].map(air_map)
