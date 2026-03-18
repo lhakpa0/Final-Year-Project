@@ -64,10 +64,14 @@ with st.form("prediction_form"):
         ["private", "public", "walk/bicycle"]
     )
 
-    vehicle_type = st.selectbox(
-        "Vehicle Type",
-        ["lpg", "petrol", "diesel", "hybrid", "electric", "none"]
-    )
+    if transport == "private":
+        vehicle_type = st.selectbox(
+            "Vehicle Type",
+            ["lpg", "petrol", "diesel", "hybrid", "electric"]
+        )
+    else:
+        vehicle_type = None
+        st.text_input("Vehicle Type", value="", disabled=True)
 
     social_activity = st.selectbox(
         "Social Activity",
@@ -178,10 +182,10 @@ if submitted:
         input_data["How Long Internet Daily Hour"]
     )
 
-    # Air travel score (raw first)
+    # Air travel score
     input_data["AirTravelScore"] = input_data["Frequency of Traveling by Air"].map(AIR_MAP)
 
-    # Scale consumption columns and overwrite original values
+    # Scale consumption columns
     consumption_values = input_data[["Monthly Grocery Bill", "How Many New Clothes Monthly"]].copy()
     scaled_consumption = consumption_scaler.transform(consumption_values)
 
@@ -193,7 +197,7 @@ if submitted:
         input_data["How Many New Clothes Monthly"]
     )
 
-    # Scale travel columns and overwrite original values
+    # Scale travel columns
     travel_values = input_data[["Vehicle Monthly Distance Km", "AirTravelScore"]].copy()
     scaled_travel = travel_scaler.transform(travel_values)
 
