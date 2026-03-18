@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import ast
 from sklearn.preprocessing import MinMaxScaler
+import os
+import joblib
 
 # Load the original dataset
 df = pd.read_csv("data/Carbon Emission.csv")
@@ -81,6 +83,15 @@ df = df.drop(columns=["Recycling", "Cooking_With"])
 print("\nNew columns created:")
 print(df[new_features].head())
 print(df.shape)
+
+os.makedirs("models", exist_ok=True)
+
+joblib.dump(consumption_scaler, "models/consumption_scaler.pkl")
+joblib.dump(travel_scaler, "models/travel_scaler.pkl")
+joblib.dump(recycling_items, "models/recycling_items.pkl")
+joblib.dump(cooking_items, "models/cooking_items.pkl")
+
+print("Saved preprocessing artifacts to models/")
 
 # Save the engineered dataset
 out_path = "data/carbon_engineered.csv"
