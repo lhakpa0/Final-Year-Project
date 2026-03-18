@@ -1,0 +1,4 @@
+Model,R²,MAE,RMSE,CV R² (5-fold)
+Gradient Boosting (Tuned),0.9856,92.04,122.44,0.9835
+Linear Regression,0.9254,198.25,278.53,0.9231
+Random Forest (Tuned),0.9279,207.66,273.72,0.9215

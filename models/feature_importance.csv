@@ -1,0 +1,43 @@
+Feature,Importance
+num__TravelIntensity,0.5247625877958668
+nom__Vehicle Type_electric,0.09950733183623008
+num__Vehicle Monthly Distance Km,0.08532663704863724
+num__WasteScore,0.05051351580067394
+nom__Vehicle Type_petrol,0.04479002483902947
+num__How Many New Clothes Monthly,0.03169884245845743
+nom__Sex_male,0.029805503965198255
+nom__Body Type_obese,0.026707893694689597
+num__ConsumptionScore,0.016848969800557355
+nom__Vehicle Type_hybrid,0.01671442043335605
+nom__Heating Energy Source_electricity,0.01638719076807266
+nom__Body Type_underweight,0.009551870721317473
+nom__Body Type_overweight,0.006944682967200906
+num__Paper,0.005110423666623191
+num__Metal,0.004526689037897206
+ord__Social Activity,0.00430155661198736
+ord__Frequency of Traveling by Air,0.004247935760654968
+nom__Heating Energy Source_wood,0.003785492738477541
+num__AirTravelScore,0.0030152946489959195
+num__How Long Internet Daily Hour,0.0022162637529879532
+nom__Heating Energy Source_natural gas,0.0020108270910214505
+num__Glass,0.0014275940929424462
+nom__Diet_vegan,0.0014223538156655665
+num__TotalScreenTime,0.0012647532720988714
+nom__Diet_vegetarian,0.0010021018652604265
+nom__Diet_pescatarian,0.0008480626155482308
+nom__Vehicle Type_lpg,0.00083288089298705
+ord__Energy efficiency,0.0007231071321470194
+num__Plastic,0.0006827540515779506
+num__Monthly Grocery Bill,0.0006637584403774575
+num__Waste Bag Weekly Count,0.0005909998120796813
+num__Oven,0.0005429449891276498
+ord__How Often Shower,0.00033754417521607294
+nom__Transport_public,0.00025368152117087904
+num__Grill,0.00018213784761332704
+num__Stove,0.00013700620296337685
+num__How Long TV PC Daily Hour,8.684568113624925e-05
+ord__Waste Bag Size,8.42351876376189e-05
+num__Airfryer,6.73325334704736e-05
+num__Microwave,5.423200229597263e-05
+num__WasteSizeScore,1.3789927282893557e-05
+nom__Transport_walk/bicycle,7.928503467795968e-06
