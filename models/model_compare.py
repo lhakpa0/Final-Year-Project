@@ -9,17 +9,19 @@ from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error, root_mean_squared_error
+from xgboost import XGBRegressor
+from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
+
 
 # Load engineered dataset
 df = pd.read_csv("data/carbon_engineered.csv")
 TARGET = "CarbonEmission"
 
-# Separate input features and target variable
+# Separate features and target
 X = df.drop(columns=[TARGET]).copy()
 y = df[TARGET].copy()
 
-# Define ordinal columns and their category order
+# Define ordinal columns and their order
 ordinal_columns = [
     "How Often Shower",
     "Frequency of Traveling by Air",
@@ -38,9 +40,7 @@ ordinal_categories = [
 
 # Identify nominal and numeric columns
 categorical_columns = X.select_dtypes(include=["object"]).columns.tolist()
-nominal_columns = [col for col in categorical_columns
-                   if col not in ordinal_columns
-                   and col not in ["Recycling", "Cooking_With"]]
+nominal_columns = [col for col in categorical_columns if col not in ordinal_columns]
 numeric_columns = [col for col in X.columns if col not in categorical_columns]
 
 # Preprocessing for numeric columns
@@ -76,14 +76,67 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-# Baseline linear regression model
+# Helper function to evaluate a fitted model
+def evaluate(name, pipeline, X_tr, y_tr, X_te, y_te, cv_score=None):
+    pred = pipeline.predict(X_te)
+    r2 = r2_score(y_te, pred)
+    mae = mean_absolute_error(y_te, pred)
+    rmse = root_mean_squared_error(y_te, pred)
+
+    # If CV score is not already available, calculate it here
+    if cv_score is None:
+        cv_score = cross_val_score(
+            pipeline, X_tr, y_tr, cv=5, scoring="r2", n_jobs=-1
+        ).mean()
+
+    print(f"R²: {r2:.4f}")
+    print(f"MAE: {mae:.2f}")
+    print(f"RMSE: {rmse:.2f}")
+    print(f"CV R² (5-fold): {cv_score:.4f}")
+
+    return {
+        "Model": name,
+        "R²": round(r2, 4),
+        "MAE": round(mae, 2),
+        "RMSE": round(rmse, 2),
+        "CV R² (5-fold)": round(cv_score, 4)
+    }
+
+results = []
+trained_models = {}
+
+# -------------------------------
+# Runtime / Computational Trade-off
+# -------------------------------
+# This script uses RandomizedSearchCV with 5-fold cross-validation
+# for several models. This improves the fairness and quality of
+# model comparison, but it also increases runtime.
+#
+# A higher number of iterations (n_iter) may improve tuning quality,
+# but it will take longer to run.
+# A lower number of iterations reduces runtime, but may miss better
+# parameter combinations.
+#
+# For this project, n_iter=10 was used as a balance between model
+# performance and available computational resources.
+# If runtime becomes too slow, n_iter can be reduced to 5.
+
+# 1. Linear Regression
+print("\nTRAINING LINEAR REGRESSION")
 linear_model = Pipeline([
     ("preprocessor", preprocessor),
     ("scaler", StandardScaler(with_mean=False)),
     ("model", LinearRegression())
 ])
 
-# Random Forest pipeline and search space
+linear_model.fit(X_train, y_train)
+results.append(
+    evaluate("Linear Regression", linear_model, X_train, y_train, X_test, y_test)
+)
+trained_models["Linear Regression"] = linear_model
+
+# 2. Random Forest
+print("\nTUNING RANDOM FOREST")
 rf_pipeline = Pipeline([
     ("preprocessor", preprocessor),
     ("model", RandomForestRegressor(random_state=42, n_jobs=-1))
@@ -98,8 +151,8 @@ rf_param_dist = {
 }
 
 rf_search = RandomizedSearchCV(
-    estimator=rf_pipeline,
-    param_distributions=rf_param_dist,
+    rf_pipeline,
+    rf_param_dist,
     n_iter=10,
     scoring="r2",
     cv=5,
@@ -108,7 +161,25 @@ rf_search = RandomizedSearchCV(
     n_jobs=-1
 )
 
-# Gradient Boosting pipeline and search space
+rf_search.fit(X_train, y_train)
+best_rf = rf_search.best_estimator_
+print("Best params:", rf_search.best_params_)
+
+results.append(
+    evaluate(
+        "Random Forest (Tuned)",
+        best_rf,
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        cv_score=rf_search.best_score_
+    )
+)
+trained_models["Random Forest (Tuned)"] = best_rf
+
+# 3. Gradient Boosting
+print("\nTUNING GRADIENT BOOSTING")
 gb_pipeline = Pipeline([
     ("preprocessor", preprocessor),
     ("model", GradientBoostingRegressor(random_state=42))
@@ -124,8 +195,8 @@ gb_param_dist = {
 }
 
 gb_search = RandomizedSearchCV(
-    estimator=gb_pipeline,
-    param_distributions=gb_param_dist,
+    gb_pipeline,
+    gb_param_dist,
     n_iter=10,
     scoring="r2",
     cv=5,
@@ -134,87 +205,81 @@ gb_search = RandomizedSearchCV(
     n_jobs=-1
 )
 
-# Train models and store results
-results = []
-trained_models = {}
-
-print("\nTRAINING LINEAR REGRESSION")
-linear_model.fit(X_train, y_train)
-linear_pred = linear_model.predict(X_test)
-linear_r2 = r2_score(y_test, linear_pred)
-linear_mae = mean_absolute_error(y_test, linear_pred)
-linear_rmse = root_mean_squared_error(y_test, linear_pred)
-linear_cv = cross_val_score(
-    linear_model, X_train, y_train, cv=5, scoring="r2", n_jobs=-1
-).mean()
-
-results.append({
-    "Model": "Linear Regression",
-    "R²": round(linear_r2, 4),
-    "MAE": round(linear_mae, 2),
-    "RMSE": round(linear_rmse, 2),
-    "CV R² (5-fold)": round(linear_cv, 4)
-})
-trained_models["Linear Regression"] = linear_model
-
-print(f"R²: {linear_r2:.4f}")
-print(f"MAE: {linear_mae:.2f}")
-print(f"RMSE: {linear_rmse:.2f}")
-print(f"CV R² (5-fold): {linear_cv:.4f}")
-
-print("\nTUNING RANDOM FOREST")
-rf_search.fit(X_train, y_train)
-best_rf = rf_search.best_estimator_
-rf_pred = best_rf.predict(X_test)
-rf_r2 = r2_score(y_test, rf_pred)
-rf_mae = mean_absolute_error(y_test, rf_pred)
-rf_rmse = root_mean_squared_error(y_test, rf_pred)
-
-results.append({
-    "Model": "Random Forest (Tuned)",
-    "R²": round(rf_r2, 4),
-    "MAE": round(rf_mae, 2),
-    "RMSE": round(rf_rmse, 2),
-    "CV R² (5-fold)": round(rf_search.best_score_, 4)
-})
-trained_models["Random Forest (Tuned)"] = best_rf
-
-print("Best parameters:", rf_search.best_params_)
-print(f"R²: {rf_r2:.4f}")
-print(f"MAE: {rf_mae:.2f}")
-print(f"RMSE: {rf_rmse:.2f}")
-print(f"CV R² (5-fold): {rf_search.best_score_:.4f}")
-
-print("\nTUNING GRADIENT BOOSTING")
 gb_search.fit(X_train, y_train)
 best_gb = gb_search.best_estimator_
-gb_pred = best_gb.predict(X_test)
-gb_r2 = r2_score(y_test, gb_pred)
-gb_mae = mean_absolute_error(y_test, gb_pred)
-gb_rmse = root_mean_squared_error(y_test, gb_pred)
+print("Best params:", gb_search.best_params_)
 
-results.append({
-    "Model": "Gradient Boosting (Tuned)",
-    "R²": round(gb_r2, 4),
-    "MAE": round(gb_mae, 2),
-    "RMSE": round(gb_rmse, 2),
-    "CV R² (5-fold)": round(gb_search.best_score_, 4)
-})
+results.append(
+    evaluate(
+        "Gradient Boosting (Tuned)",
+        best_gb,
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        cv_score=gb_search.best_score_
+    )
+)
 trained_models["Gradient Boosting (Tuned)"] = best_gb
 
-print("Best parameters:", gb_search.best_params_)
-print(f"R²: {gb_r2:.4f}")
-print(f"MAE: {gb_mae:.2f}")
-print(f"RMSE: {gb_rmse:.2f}")
-print(f"CV R² (5-fold): {gb_search.best_score_:.4f}")
+# 4. XGBoost
+print("\nTUNING XGBOOST")
+xgb_pipeline = Pipeline([
+    ("preprocessor", preprocessor),
+    ("model", XGBRegressor(
+        objective="reg:squarederror",
+        random_state=42,
+        n_jobs=-1,
+        verbosity=0,
+        tree_method="hist"
+    ))
+])
 
-# Create summary table of model results
+xgb_param_dist = {
+    "model__n_estimators": [100, 200, 300, 500],
+    "model__learning_rate": [0.01, 0.05, 0.1, 0.2],
+    "model__max_depth": [3, 4, 5, 6, 8],
+    "model__subsample": [0.7, 0.8, 0.9, 1.0],
+    "model__colsample_bytree": [0.6, 0.7, 0.8, 1.0],
+    "model__reg_alpha": [0, 0.1, 0.5],
+    "model__reg_lambda": [1, 1.5, 2]
+}
+
+xgb_search = RandomizedSearchCV(
+    xgb_pipeline,
+    xgb_param_dist,
+    n_iter=10,
+    scoring="r2",
+    cv=5,
+    verbose=1,
+    random_state=42,
+    n_jobs=-1
+)
+
+xgb_search.fit(X_train, y_train)
+best_xgb = xgb_search.best_estimator_
+print("Best params:", xgb_search.best_params_)
+
+results.append(
+    evaluate(
+        "XGBoost (Tuned)",
+        best_xgb,
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        cv_score=xgb_search.best_score_
+    )
+)
+trained_models["XGBoost (Tuned)"] = best_xgb
+
+# Summary table
 results_df = pd.DataFrame(results).sort_values("CV R² (5-fold)", ascending=False)
 
 print("\nSUMMARY TABLE")
 print(results_df.to_string(index=False))
 
-# Select and save the best-performing model
+# Select and save best model
 best_row = results_df.iloc[0]
 best_name = best_row["Model"]
 best_model = trained_models[best_name]
@@ -230,12 +295,17 @@ os.makedirs("models", exist_ok=True)
 joblib.dump(best_model, "models/best_model_new.pkl")
 print("\nBest model saved to: models/best_model_new.pkl")
 
-# Save model comparison results
 results_df.to_csv("models/model_comparison_results.csv", index=False)
 print("Results table saved to: models/model_comparison_results.csv")
 
-# Extract feature importance for tree-based models
-if best_name in ["Random Forest (Tuned)", "Gradient Boosting (Tuned)"]:
+# Feature importance for tree-based models
+tree_models = [
+    "Random Forest (Tuned)",
+    "Gradient Boosting (Tuned)",
+    "XGBoost (Tuned)"
+]
+
+if best_name in tree_models:
     try:
         feature_names = best_model.named_steps["preprocessor"].get_feature_names_out()
         importances = best_model.named_steps["model"].feature_importances_
@@ -255,7 +325,6 @@ if best_name in ["Random Forest (Tuned)", "Gradient Boosting (Tuned)"]:
         print("\nCould not extract feature importance.")
         print("Reason:", e)
 
-# Print column groupings for checking
-print("Ordinal columns:", ordinal_columns)
+print("\nOrdinal columns:", ordinal_columns)
 print("Nominal columns:", nominal_columns)
 print("Numeric columns:", numeric_columns)
