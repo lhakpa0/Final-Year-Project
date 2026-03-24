@@ -105,22 +105,6 @@ def evaluate(name, pipeline, X_tr, y_tr, X_te, y_te, cv_score=None):
 results = []
 trained_models = {}
 
-# -------------------------------
-# Runtime / Computational Trade-off
-# -------------------------------
-# This script uses RandomizedSearchCV with 5-fold cross-validation
-# for several models. This improves the fairness and quality of
-# model comparison, but it also increases runtime.
-#
-# A higher number of iterations (n_iter) may improve tuning quality,
-# but it will take longer to run.
-# A lower number of iterations reduces runtime, but may miss better
-# parameter combinations.
-#
-# For this project, n_iter=10 was used as a balance between model
-# performance and available computational resources.
-# If runtime becomes too slow, n_iter can be reduced to 5.
-
 # 1. Linear Regression
 print("\nTRAINING LINEAR REGRESSION")
 linear_model = Pipeline([
