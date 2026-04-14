@@ -6,40 +6,35 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-raw_path = os.path.join(BASE_DIR, "data", "Carbon Emission.csv")
+raw_path = os.path.join(BASE_DIR, "data", "raw", "Carbon Emission.csv")
 TARGET = "CarbonEmission"
-PLOT_DIR = os.path.join(BASE_DIR, "src", "eda_plots")
+PLOT_DIR = os.path.join(BASE_DIR, "results", "plots", "eda")
 os.makedirs(PLOT_DIR, exist_ok=True)
 
 df = pd.read_csv(raw_path)
 
-#  Dataset overview 
-
+# Dataset overview
 print("Dataset overview")
 print(f"Shape: {df.shape[0]} rows x {df.shape[1]} columns")
 print(f"\nColumn types:\n{df.dtypes.value_counts()}")
 print(f"\nFirst 5 rows:\n{df.head()}")
 
 # Missing values
-
 print("\nMissing values & duplicates")
-
 missing = df.isna().sum()
 print(f"Missing values:")
 print(missing[missing > 0] if missing.any() else "None")
 print(f"\nTotal missing: {missing.sum()}")
 print(f"Duplicates: {df.duplicated().sum()}")
 
-# Vehicle Type is only filled in when Transport = private, so those NaNs
-# are expected is not actual missing data
+# Check Vehicle Type NaNs are only for non private transport
 if "Vehicle Type" in df.columns:
     print("\nVehicle Type by Transport mode:")
     cross = pd.crosstab(df["Transport"], df["Vehicle Type"].isna(), margins=True)
     cross.columns = ["Has Value", "NaN", "Total"]
     print(cross)
 
-# Target variable
-
+# Target variable stats and distribution plot
 print("\nTarget variable")
 print(df[TARGET].describe())
 print(f"\nSkewness: {df[TARGET].skew():.3f}")
@@ -62,8 +57,7 @@ plt.tight_layout()
 plt.savefig(f"{PLOT_DIR}/target_distribution.png", dpi=150)
 plt.close()
 
-# Numeric features
-
+# Numeric feature distributions
 print("\nNumeric features")
 numeric_cols = df.select_dtypes(include=[np.number]).columns.drop(TARGET)
 print(df[numeric_cols].describe().round(2))
@@ -80,8 +74,7 @@ plt.suptitle("Numeric Feature Distributions", fontsize=13)
 plt.tight_layout()
 plt.savefig(f"{PLOT_DIR}/numeric_distributions.png", dpi=150)
 plt.close()
-# Categorical features
-
+# Categorical feature value counts and bar charts
 print("\nCategorical features")
 
 cat_cols = ["Body Type", "Sex", "Diet", "How Often Shower",
@@ -106,8 +99,7 @@ plt.tight_layout()
 plt.savefig(f"{PLOT_DIR}/categorical_distributions.png", dpi=150)
 plt.close()
 
-# Emissions by category
-
+# Box plots showing emission spread for each category
 print("\nEmissions by category")
 
 key_cats = ["Diet", "Transport", "Heating Energy Source", "Body Type",
@@ -125,8 +117,7 @@ plt.tight_layout()
 plt.savefig(f"{PLOT_DIR}/emission_by_category.png", dpi=150)
 plt.close()
 
-# Correlations
-
+# Pearson correlation between numeric features and target
 print("\nCorrelations")
 
 corr_with_target = df[numeric_cols.tolist() + [TARGET]].corr()[TARGET].drop(TARGET).sort_values(ascending=False)
@@ -141,7 +132,7 @@ plt.tight_layout()
 plt.savefig(f"{PLOT_DIR}/feature_target_correlation.png", dpi=150)
 plt.close()
 
-# Correlation heatmap
+# Full correlation heatmap
 fig, ax = plt.subplots(figsize=(10, 8))
 corr_matrix = df[numeric_cols.tolist() + [TARGET]].corr()
 sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="coolwarm", center=0, ax=ax, square=True)
@@ -150,8 +141,7 @@ plt.tight_layout()
 plt.savefig(f"{PLOT_DIR}/correlation_heatmap.png", dpi=150)
 plt.close()
 
-# Outliers
-
+# Count outliers using IQR method
 print("\nOutliers (IQR method)")
 
 for col in numeric_cols.tolist() + [TARGET]:
@@ -162,8 +152,7 @@ for col in numeric_cols.tolist() + [TARGET]:
     if n_outliers > 0:
         print(f"  {col}: {n_outliers} outliers ({n_outliers / len(df) * 100:.1f}%)")
 
-# Multi-select columns
-
+# Parse and count recycling and cooking multi select values
 print("\nRecycling & cooking")
 
 df["Recycling_parsed"] = df["Recycling"].apply(ast.literal_eval)
