@@ -27,7 +27,7 @@ streamlit run app.py
 ```
 
 ## Project structure
-
+```text
 ├── app.py                     # Streamlit web application
 ├── requirements.txt           # Python dependencies
 ├── data/
@@ -49,6 +49,7 @@ streamlit run app.py
     ├── predict.py             # Standalone prediction smoke test
     └── utils.py               # Shared helpers re-exported for app.py
 
+```
 
 ## Important outputs
 - `data/processed/carbon_engineered.csv` — engineered training dataset
