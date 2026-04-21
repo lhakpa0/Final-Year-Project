@@ -23,7 +23,7 @@ DEMOGRAPHIC_FEATURES = {"Sex", "Body Type"}
 def apply_basic_features(df):
     # Create waste score
     df = df.copy()
-    df["WasteSizeScore"] = df["Waste Bag Size"].map(WASTE_SIZE_MAP)
+    df["WasteSizeScore"] = df["Waste Bag Size"].map(WASTE_SIZE_MAP) # Map bag sizes to numeric scores based on the defined mapping, which allows us to combine it with the count of bags for a more meaningful feature.
     df["WasteScore"] = df["Waste Bag Weekly Count"] * df["WasteSizeScore"]
     return df.drop(columns=["WasteSizeScore"])
 
@@ -33,7 +33,7 @@ def apply_scaled_features(df, consumption_scaler):
     scaled = consumption_scaler.transform(
         df[["Monthly Grocery Bill", "How Many New Clothes Monthly"]]
     )
-    df["ConsumptionScore"] = scaled[:, 0] + scaled[:, 1]
+    df["ConsumptionScore"] = scaled[:, 0] + scaled[:, 1] # simple sum of scaled features, could also try weighted sum or PCA for more complex combinations  
     return df
 
 def build_engineered_dataset():
@@ -66,7 +66,7 @@ def save_feature_artifacts(df, recycling_items, cooking_items):
     joblib.dump(cooking_items, MODELS_DIR / "cooking_items.pkl")
     print("Saved item lists to models/")
 
-    df.to_csv(PROCESSED_DATA_PATH, index=False)
+    df.to_csv(PROCESSED_DATA_PATH, index=False)  
     print(f"\nSaved: {PROCESSED_DATA_PATH}")
 
 def plot_feature_check(df):
@@ -79,7 +79,7 @@ def plot_feature_check(df):
     plt.tight_layout()
     plt.show()
 
-def main():
+def main(): 
     # Run the full feature engineering pipeline
     df, recycling_items, cooking_items = build_engineered_dataset()
     print("\nNew columns created:")
@@ -87,7 +87,7 @@ def main():
     print(df.shape)
 
     save_feature_artifacts(df, recycling_items, cooking_items)
-    plot_feature_check(df)
+    plot_feature_check(df) #
 
 if __name__ == "__main__":
     main()

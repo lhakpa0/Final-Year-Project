@@ -28,11 +28,11 @@ def build_preprocessor(X_train):
 
     # Median fill for numbers
     numeric_transformer = Pipeline([
-        ("imputer", SimpleImputer(strategy="median"))
+        ("imputer", SimpleImputer(strategy="median")) # Impute missing numeric values with the median of each column.
     ])
     # Encode ordered categories as integers
     ordinal_transformer = Pipeline([
-        ("imputer", SimpleImputer(strategy="most_frequent")),
+        ("imputer", SimpleImputer(strategy="most_frequent")), # Impute missing ordinal values with the most frequent category.
         ("encoder", OrdinalEncoder(
             categories=ORDINAL_CATEGORIES,
             handle_unknown="use_encoded_value",
@@ -44,7 +44,7 @@ def build_preprocessor(X_train):
         ("imputer", SimpleImputer(strategy="most_frequent")),
         ("encoder", OneHotEncoder(drop="first", handle_unknown="ignore")),
     ])
-    preprocessor = ColumnTransformer([
+    preprocessor = ColumnTransformer([ # Combine all transformers into a single preprocessor that applies the appropriate transformations to each column type.
         ("num", numeric_transformer, numeric_columns),
         ("ord", ordinal_transformer, ordinal_columns),
         ("nom", nominal_transformer, nominal_columns),

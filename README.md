@@ -34,7 +34,6 @@ streamlit run app.py
 │   ├── raw/                   # Original dataset (Kaggle CSV)
 │   └── processed/             # Engineered dataset produced by features.py
 ├── models/                    # Trained model files and preprocessing artifacts (.pkl)
-├── notebooks/                 # Exploratory Jupyter notebooks
 ├── results/
 │   ├── metrics.csv            # Model comparison metrics
 │   ├── feature_importance.csv # Feature importances from best model

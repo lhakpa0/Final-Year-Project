@@ -1,3 +1,4 @@
+# Required libraries for EDA analysis.
 import os
 import ast
 import pandas as pd
@@ -10,7 +11,7 @@ RAW_PATH = os.path.join(BASE_DIR, "data", "raw", "Carbon Emission.csv")
 TARGET = "CarbonEmission"
 PLOT_DIR = os.path.join(BASE_DIR, "results", "plots", "eda")
 os.makedirs(PLOT_DIR, exist_ok=True)
-
+# This script performs exploratory data analysis (EDA) on the raw dataset to understand its structure, distributions, and relationships before preprocessing and modeling.
 df = pd.read_csv(RAW_PATH)
 
 # Dataset overview

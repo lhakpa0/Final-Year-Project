@@ -19,7 +19,7 @@ def evaluate_model(name, pipeline, X_train, y_train, X_test, y_test, cv_score=No
     print(f"MAE: {mae:.2f}")
     print(f"RMSE: {rmse:.2f}")
     print(f"CV R2 (5-fold): {cv_score:.4f}")
-
+    # Return metrics as a dictionary for easy comparison.
     return {
         "Model": name,
         "R2": round(r2, 4),
