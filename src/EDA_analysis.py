@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-raw_path = os.path.join(BASE_DIR, "data", "raw", "Carbon Emission.csv")
+RAW_PATH = os.path.join(BASE_DIR, "data", "raw", "Carbon Emission.csv")
 TARGET = "CarbonEmission"
 PLOT_DIR = os.path.join(BASE_DIR, "results", "plots", "eda")
 os.makedirs(PLOT_DIR, exist_ok=True)
 
-df = pd.read_csv(raw_path)
+df = pd.read_csv(RAW_PATH)
 
 # Dataset overview
 print("Dataset overview")

@@ -1,0 +1,5 @@
+Model,R2,MAE,RMSE,CV R2 (5-fold)
+XGBoost,0.9865,87.91,118.56,0.9854
+Gradient Boosting,0.9856,90.74,122.53,0.9846
+Linear Regression,0.9254,198.25,278.53,0.9231
+Random Forest,0.9279,207.75,273.89,0.9228

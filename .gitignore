@@ -10,6 +10,7 @@ build/
 .venv/
 venv/
 env/
+old_model_env/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -19,7 +20,7 @@ env/
 .vscode/
 
 # Generated model artifacts
-models/best_model.pkl
+models/*.pkl
 
 # OS
 .DS_Store

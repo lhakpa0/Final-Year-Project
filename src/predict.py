@@ -5,6 +5,7 @@ from features import PROCESSED_DATA_PATH
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 MODELS_DIR = BASE_DIR / "models"
+
 def main():
     # Load data and model, predict a single row, print result
     df = pd.read_csv(PROCESSED_DATA_PATH)
@@ -24,5 +25,6 @@ def main():
     print(f"\nActual: {actual}")
     print(f"Predicted: {pred:.2f}")
     print(f"Difference: {pred - actual:.2f}")
+
 if __name__ == "__main__":
     main()

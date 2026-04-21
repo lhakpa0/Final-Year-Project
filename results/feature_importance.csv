@@ -1,0 +1,39 @@
+Feature,Importance
+ord__Frequency of Traveling by Air,0.22354633
+nom__Vehicle Type_electric,0.17206776
+num__Vehicle Monthly Distance Km,0.10867531
+nom__Vehicle Type_petrol,0.08683818
+nom__Vehicle Type_lpg,0.07182776
+nom__Sex_male,0.039299015
+nom__Body Type_obese,0.032249052
+nom__Body Type_underweight,0.032046903
+nom__Heating Energy Source_electricity,0.030097963
+num__WasteScore,0.027675236
+nom__Transport_walk/bicycle,0.027393132
+nom__Vehicle Type_hybrid,0.021726819
+num__How Many New Clothes Monthly,0.01641223
+nom__Body Type_overweight,0.0131547125
+num__Metal,0.011920772
+num__Paper,0.011303938
+num__ConsumptionScore,0.0098009985
+ord__Social Activity,0.007847648
+nom__Heating Energy Source_wood,0.007677138
+nom__Transport_public,0.0074335714
+nom__Heating Energy Source_natural gas,0.0071295826
+num__Waste Bag Weekly Count,0.004839047
+num__Glass,0.0042680004
+nom__Diet_vegan,0.0035255537
+num__How Long Internet Daily Hour,0.0026223874
+nom__Diet_pescatarian,0.002621492
+nom__Diet_vegetarian,0.0025679704
+num__Plastic,0.0025388096
+ord__Energy efficiency,0.0016729627
+num__Oven,0.0016436826
+num__Airfryer,0.0016182115
+num__Grill,0.0013187663
+ord__Waste Bag Size,0.0012260899
+ord__How Often Shower,0.00083411986
+num__Stove,0.00074693153
+num__How Long TV PC Daily Hour,0.00072801154
+num__Monthly Grocery Bill,0.000705404
+num__Microwave,0.00039847317

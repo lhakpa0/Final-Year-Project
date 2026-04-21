@@ -127,7 +127,6 @@ def plot_model_comparison(trained_models, X, y, save_path):
         "XGBoost": "#1f77b4",
         "Linear Regression": "#2ca02c",
         "Random Forest": "#ff7f0e",
-        "SVR": "#9467bd",
     }
 
     comparison_sizes = np.linspace(0.1, 1.0, 10)

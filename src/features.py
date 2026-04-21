@@ -8,6 +8,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 RAW_DATA_PATH = BASE_DIR / "data" / "raw" / "Carbon Emission.csv"
 PROCESSED_DATA_PATH = BASE_DIR / "data" / "processed" / "carbon_engineered.csv"
 MODELS_DIR = BASE_DIR / "models"
+
 # Map bag sizes to numbers for WasteScore calculation
 WASTE_SIZE_MAP = {
     "small": 1,
@@ -15,7 +16,8 @@ WASTE_SIZE_MAP = {
     "large": 3,
     "extra large": 4,
 }
-# These features are excluded from SHAP charts because users cannot change them
+
+# These features are excluded from SHAP charts because those are demographic features and users cannot change them.
 DEMOGRAPHIC_FEATURES = {"Sex", "Body Type"}
 
 def apply_basic_features(df):
@@ -33,6 +35,7 @@ def apply_scaled_features(df, consumption_scaler):
     )
     df["ConsumptionScore"] = scaled[:, 0] + scaled[:, 1]
     return df
+
 def build_engineered_dataset():
     # Load raw CSV, parse multi select columns, one hot encode them, and add WasteScore
     df = pd.read_csv(RAW_DATA_PATH)
@@ -65,6 +68,7 @@ def save_feature_artifacts(df, recycling_items, cooking_items):
 
     df.to_csv(PROCESSED_DATA_PATH, index=False)
     print(f"\nSaved: {PROCESSED_DATA_PATH}")
+
 def plot_feature_check(df):
     # Quick correlation check to verify engineered features are useful
     print(df[["WasteScore", "CarbonEmission"]].corr()["CarbonEmission"])
@@ -74,6 +78,7 @@ def plot_feature_check(df):
     plt.ylabel("Correlation value")
     plt.tight_layout()
     plt.show()
+
 def main():
     # Run the full feature engineering pipeline
     df, recycling_items, cooking_items = build_engineered_dataset()
@@ -83,7 +88,6 @@ def main():
 
     save_feature_artifacts(df, recycling_items, cooking_items)
     plot_feature_check(df)
-
 
 if __name__ == "__main__":
     main()

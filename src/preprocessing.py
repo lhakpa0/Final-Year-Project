@@ -18,6 +18,7 @@ ORDINAL_CATEGORIES = [
     ["No", "Sometimes", "Yes"],
     ["never", "sometimes", "often"],
 ]
+
 def build_preprocessor(X_train):
     # Separate columns by type and build a transformer for each
     categorical_columns = X_train.select_dtypes(include=["object", "string"]).columns.tolist()

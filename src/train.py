@@ -4,7 +4,6 @@ import joblib
 import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from sklearn.preprocessing import MinMaxScaler
-
 from evaluate import (
     evaluate_model,
     plot_evaluation,
@@ -21,7 +20,6 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 MODELS_DIR = BASE_DIR / "models"
 RESULTS_DIR = BASE_DIR / "results"
 PLOTS_DIR = RESULTS_DIR / "plots"
-
 
 def train_single_model(model_class, preprocessor, X_train, y_train, X_test, y_test):
     # Train one model with optional hyperparameter tuning
